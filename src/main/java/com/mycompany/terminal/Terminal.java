@@ -4,6 +4,7 @@
 
 package com.mycompany.terminal;
 
+import java.io.File;
 import java.util.Scanner;
 
 /**
@@ -14,15 +15,38 @@ import java.util.Scanner;
 public class Terminal {
     Parser parser;
     //Implement each command in a method, for example:
-    public String pwd(){
-        return "";
+    public void pwd(){
+        System.out.println(System.getProperty("user.dir"));
     }
     public void cd(String[] args){
 
     }
     // echo takes 1 arg and print it
-    public String echo(String[] args){
-        return "";
+    public void echo(String[] args){
+        if (args.length >= 1) {
+            String message = String.join(" ", args);
+            System.out.println(message);
+        } else {
+            System.out.println("No message to echo.");
+        }
+    }
+
+    public void ls(){
+        File currentDirectory = new File(System.getProperty("user.dir"));
+
+        // List the files in the current directory
+        File[] files = currentDirectory.listFiles();
+        
+        if (files != null) {
+            System.out.println("Files in the current directory:");
+            for (File file : files) {
+                System.out.println(file.getName());
+            }
+        }
+    }
+    
+    public void touch(String[] args){
+
     }
     //This method will choose the suitable command method to be called
     public void chooseCommandAction(){
@@ -37,19 +61,21 @@ public class Terminal {
         }
     }
     public static void main(String[] args){
-        System.out.print("Enter a command: ");
-        Scanner scanner = new Scanner(System.in);
-        String input = scanner.nextLine();
+        // System.out.print("Enter a command: ");
+        // Scanner scanner = new Scanner(System.in);
+        // String input = scanner.nextLine();
         
-        Terminal terminal = new Terminal();
-        terminal.parser = new Parser();
+        // Terminal terminal = new Terminal();
+        // terminal.parser = new Parser();
 
-        if (terminal.parser.parse(input)) {
-            terminal.chooseCommandAction();
-        } else {
-            System.out.println("Failed to parse the command.");
-        }
-        scanner.close();
+        // if (terminal.parser.parse(input)) {
+        //     terminal.chooseCommandAction();
+        // } else {
+        //     System.out.println("Failed to parse the command.");
+        // }
+        // scanner.close();
+        Terminal terminal = new Terminal();
+        terminal.ls();
     }
 
 }
