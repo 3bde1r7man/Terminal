@@ -88,6 +88,26 @@ public class Terminal {
             }
         }
     }
+    // 
+    public void mkdir(String[] args){
+        if(args.length == 0){
+            System.out.println("No arguments specified.");
+        }
+        String path = args[0];
+        if(args.length > 1){
+            path = String.join(" ", args);
+        }
+        File directory = new File(path);
+        if (directory.exists()) {
+            System.out.println("Directory '" + path + "' already exists.");
+        } else {
+            if (directory.mkdirs()) {
+                System.out.println("Directory '" + path + "' created successfully.");
+            } else {
+                System.err.println("Failed to create directory '" + path + "'.");
+            }
+        }
+    }
     // Takes 1 argument which is either the full path or the short path that ends with a file name and creates this file.
     public void touch(String[] args){
         try {
@@ -200,6 +220,8 @@ public class Terminal {
             cd(parser.getArgs());
         } else if (parser.getCommandName().equals("ls")) {
             ls(parser.getArgs());
+        } else if(parser.getCommandName().equals("mkdir")) {
+            mkdir(parser.getArgs());
         } else if(parser.getCommandName().equals("touch")) {
             touch(parser.getArgs());
         } else if (parser.getCommandName().equals("rm")) {
