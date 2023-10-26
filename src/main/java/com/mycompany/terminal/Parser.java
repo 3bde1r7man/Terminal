@@ -6,13 +6,20 @@ public class Parser {
     //This method will divide the input into commandName and args
     //where "input" is the string command entered by the user
     public boolean parse(String input){
-        return false;
+        
+        // split the input into commandName and args
+        String[] words = input.split("\\s+");
+        commandName = words[0].toLowerCase();
+        args = new String[words.length - 1];
+        for (int i = 1; i < words.length; i++) {
+            args[i-1] = words[i];
+        }
+        return true;
     }
     public String getCommandName(){
-        return "";
+        return commandName;
     }
     public String[] getArgs(){
-        return new String[];
+        return args;
     }
-    
 }
