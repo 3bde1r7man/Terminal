@@ -9,10 +9,10 @@ public class Parser {
         return false;
     }
     public String getCommandName(){
-        return "";
+        return commandName;
     }
     public String[] getArgs(){
-        return new String[];
+        return args;
     }
     
 }
