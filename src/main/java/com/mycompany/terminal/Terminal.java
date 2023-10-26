@@ -4,7 +4,10 @@
 
 package com.mycompany.terminal;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -107,6 +110,75 @@ public class Terminal {
         }
         
     }
+
+    public void cat(String[] args) {
+        if(args.length == 1){
+            printFileContent(args[0]);
+        }else if (args.length == 2){
+            concatenateAndPrintFiles(args[0], args[1]);
+        }else{
+            System.out.println("no arguments specified or more arguments specified.");
+        }
+    }
+    public void printFileContent(String fileName) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.err.println("Error reading the file: " + e.getMessage());
+        }
+    }
+
+    public void concatenateAndPrintFiles(String fileName1, String fileName2) {
+        try {
+            BufferedReader reader1 = new BufferedReader(new FileReader(fileName1));
+            BufferedReader reader2 = new BufferedReader(new FileReader(fileName2));
+
+            String line;
+            while ((line = reader1.readLine()) != null) {
+                System.out.println(line);
+            }
+            reader1.close();
+
+            while ((line = reader2.readLine()) != null) {
+                System.out.println(line);
+            }
+            reader2.close();
+        } catch (IOException e) {
+            System.err.println("Error reading the file(s): " + e.getMessage());
+        }
+    }
+    // count the number of line &  words and characters in the file
+    public void wc(String[] args) {
+        String fileName = args[0];
+        int lineCount = 0;
+        int wordCount = 0;
+        int charCount = 0;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                lineCount++;
+                charCount += line.length();
+                String[] words = line.split("\\s+"); // Split line into words
+                wordCount += words.length;
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.err.println("Error reading the file: " + e.getMessage());
+        }
+
+        System.out.println("Lines: " + lineCount);
+        System.out.println("Words: " + wordCount);
+        System.out.println("Characters: " + charCount);
+        System.out.println("File Name: " + fileName);
+    }
+
     //This method will choose the suitable command method to be called
     public void chooseCommandAction(){
         if (parser.getCommandName().equals("echo")) {
@@ -119,7 +191,11 @@ public class Terminal {
             ls(parser.getArgs());
         }else if (parser.getCommandName().equals("rm")) {
             rm(parser.getArgs());
-        } else if (parser.getCommandName().equals("exit")) {
+        }else if (parser.getCommandName().equals("cat")){
+            cat(parser.getArgs());
+        }else if(parser.getCommandName().equals("wc")) {
+            wc(parser.getArgs());
+        }else if (parser.getCommandName().equals("exit")) {
             System.exit(0);
         }else {
             System.out.println("Unknown command: " + parser.getCommandName());
