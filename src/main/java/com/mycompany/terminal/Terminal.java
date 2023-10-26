@@ -88,11 +88,22 @@ public class Terminal {
             }
         }
     }
-    // Takes 1 argument which is either the full path or the relative (short) path that ends with a file name and creates this file.
+    // Takes 1 argument which is either the full path or the short path that ends with a file name and creates this file.
     public void touch(String[] args){
-
+        try {
+            String path = args[0];
+            if(args.length > 1){
+                path = String.join(" ", args);
+                System.out.println(path);
+            }
+            File file = new File(path);
+            file.createNewFile();
+            System.out.println("File " + file.getName() + " created successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    // 
+    // rmoves file from the current directory
     public void rm(String[] args){
         if(args.length == 0){
             System.out.println("You must specify a file name.");
@@ -132,7 +143,7 @@ public class Terminal {
             System.err.println("Error reading the file: " + e.getMessage());
         }
     }
-
+    
     public void concatenateAndPrintFiles(String fileName1, String fileName2) {
         try {
             BufferedReader reader1 = new BufferedReader(new FileReader(fileName1));
@@ -187,17 +198,19 @@ public class Terminal {
             pwd();
         } else if (parser.getCommandName().equals("cd")) {
             cd(parser.getArgs());
-        }else if (parser.getCommandName().equals("ls")) {
+        } else if (parser.getCommandName().equals("ls")) {
             ls(parser.getArgs());
-        }else if (parser.getCommandName().equals("rm")) {
+        } else if(parser.getCommandName().equals("touch")) {
+            touch(parser.getArgs());
+        } else if (parser.getCommandName().equals("rm")) {
             rm(parser.getArgs());
-        }else if (parser.getCommandName().equals("cat")){
+        } else if (parser.getCommandName().equals("cat")){
             cat(parser.getArgs());
-        }else if(parser.getCommandName().equals("wc")) {
+        } else if(parser.getCommandName().equals("wc")) {
             wc(parser.getArgs());
-        }else if (parser.getCommandName().equals("exit")) {
+        } else if (parser.getCommandName().equals("exit")) {
             System.exit(0);
-        }else {
+        } else {
             System.out.println("Unknown command: " + parser.getCommandName());
         }
     }
