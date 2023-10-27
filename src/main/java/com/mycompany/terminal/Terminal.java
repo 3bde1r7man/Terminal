@@ -7,9 +7,11 @@ package com.mycompany.terminal;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.ArrayList; 
+import java.util.ArrayList;
+import java.util.List; 
 
 /**
  *
@@ -263,7 +265,58 @@ public class Terminal {
     }
 
     //This method will choose the suitable command method to be called
-    public void chooseCommandAction(){
+    public void executeTerminal() {
+        chooseCommandAction();
+        Scanner scanner = new Scanner(System.in);
+        while (!parser.getCommandName().equals("exit")) {
+            if (parser.isOutputToFile()) {
+                writeOutputToFileInternal(false);
+            }
+            if (parser.isOutputToAppend()) {
+                writeOutputToFileInternal(true);
+            } else {
+                printOutput();
+            }
+            System.out.print("Enter a command: ");
+            parser.parse(scanner.nextLine());
+            chooseCommandAction();
+
+        }
+        scanner.close();
+    }
+    
+    public void printOutput() {
+        if (!error.isEmpty()) {
+            for (String message : error) {
+                System.err.println(message);
+            }
+            error.clear();
+        } else {
+            for (String message : output) {
+                System.out.println(message);
+            }
+            output.clear();
+        }
+    }
+
+    private void writeOutputToFileInternal(boolean append) {
+        try {
+            FileWriter fileWriter = new FileWriter(parser.getOutputFile(), append);
+
+            List<String> messages = error.isEmpty() ? output : error;
+            for (String message : messages) {
+                fileWriter.write(message + "\n");
+            }
+            messages.clear();
+
+            fileWriter.close();
+        } catch (IOException e) {
+            error.add("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+    public void chooseCommandAction() {
         history.add(parser.getCommandName());
         if (parser.getCommandName().equals("echo")) {
             echo(parser.getArgs());
@@ -285,12 +338,15 @@ public class Terminal {
             wc(parser.getArgs());
         } else if (parser.getCommandName().equals("history")) {
             history(parser.getArgs());
+        } else if (parser.getCommandName().equals("rmdir")) {
+            rmdir(parser.getArgs());
         } else if (parser.getCommandName().equals("exit")) {
             System.exit(0);
         } else {
             error.add("Unknown command: " + parser.getCommandName());
         }
     }
+
     public static void main(String[] args){
         System.out.print("Enter a command: ");
         Scanner scanner = new Scanner(System.in);
@@ -300,7 +356,7 @@ public class Terminal {
         terminal.parser = new Parser();
 
         if (terminal.parser.parse(input)) {
-            terminal.chooseCommandAction();
+            terminal.executeTerminal();
         } else {
             System.out.println("Failed to parse the command.");
         }
