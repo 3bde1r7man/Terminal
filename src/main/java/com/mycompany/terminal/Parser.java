@@ -8,13 +8,13 @@ public class Parser {
 
     public boolean parse(String input) {
         // Split the input into commandName and args
-        String[] words = input.split("\\s+");
+        String[] words = input.split(" ");
         
         // Initialize args as an empty array with the same length as words
         int length = words.length;
         for (int i = 0; i < words.length; i++) {
             if (i == words.length - 2) {
-                if (words[i].equals(">")) {
+                if (words[i].equals(">")) {        
                     outputToFile = true;
                     outputToAppend = false;
                     outputFile = words[i + 1];
@@ -40,7 +40,8 @@ public class Parser {
         commandName = words[0];
 
         for (int i = 1; i < words.length && words[i] != ""; i++) {
-            if(words[i].equals(">") || words[i].equals(">>")) {
+            // check if the next word is a redirection operator and if the word after that is not empty
+            if(((i + 1) != words.length ) && (words[i].equals(">") || words[i].equals(">>")) && (!words[i + 1].equals(""))) {
                 break;
             }
             args[i - 1] = words[i];

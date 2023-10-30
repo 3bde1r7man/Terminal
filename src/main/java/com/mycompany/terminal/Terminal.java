@@ -226,7 +226,26 @@ public class Terminal {
             error.add("Unknown argument.");
         }
     }
-
+    
+    // cp Takes 2 arguments, both are files and copies the first onto the second.
+    public void cp(String[] args){
+        if(args.length == 2){
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(args[0]));
+                FileWriter writer = new FileWriter(args[1]);
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    writer.write(line + "\n");
+                }
+                reader.close();
+                writer.close();
+            } catch (IOException e) {
+                error.add("Error reading the file: " + e.getMessage());
+            }
+        }else{
+            error.add("no arguments specified or more arguments specified.");
+        }
+    }
     // rmdir command delete directory only if it is empty
     public void rmdir(String[] args){
         if(args.length == 0){
@@ -338,6 +357,8 @@ public class Terminal {
             wc(parser.getArgs());
         } else if (parser.getCommandName().equals("history")) {
             history(parser.getArgs());
+        } else if (parser.getCommandName().equals("cp")) {
+            cp(parser.getArgs());
         } else if (parser.getCommandName().equals("rmdir")) {
             rmdir(parser.getArgs());
         } else if (parser.getCommandName().equals("exit")) {
