@@ -53,21 +53,50 @@ public class Terminal {
             output.add("Changed working directory to: " + System.getProperty("user.dir"));
         }else if (args.length == 1) {
             File directory = new File(args[0]);
-            if (directory.exists() && directory.isDirectory()) {
-                // The path exists and is a directory
-                error.add("The directory exists: " + directory.getAbsolutePath());
-
-                // Change the current working directory
-                if (directory.isDirectory()) {
+            if (directory.isAbsolute()) {
+                // Absolute path provided
+                if (directory.exists() && directory.isDirectory()) {
                     System.setProperty("user.dir", directory.getAbsolutePath());
                     output.add("Changed working directory to: " + System.getProperty("user.dir"));
+                } else {
+                    error.add("Invalid path or The directory does not exist: " + directory.getAbsolutePath());
                 }
             } else {
-                // The path does not exist or is not a directory
-                error.add("Invalid path or The directory does not exist: " + directory.getAbsolutePath());
+                // Relative path provided
+                File currentDirectory = new File(System.getProperty("user.dir"));
+                File newDirectory = new File(currentDirectory, args[0]);
+
+                if (newDirectory.exists() && newDirectory.isDirectory()) {
+                    System.setProperty("user.dir", newDirectory.getAbsolutePath());
+                    output.add("Changed working directory to: " + System.getProperty("user.dir"));
+                } else {
+                    error.add("Invalid path or The directory does not exist: " + newDirectory.getAbsolutePath());
+                }
             }
-        }else { // If more than one argument
-            output.add("There is no specified path.");
+        }else if (args.length > 1) { 
+            String path = String.join(" ", args);
+            File directory = new File(path);
+            if (directory.isAbsolute()){
+                // Absolute path provided
+                if (directory.exists() && directory.isDirectory()) {
+                    System.setProperty("user.dir", directory.getAbsolutePath());
+                    output.add("Changed working directory to: " + System.getProperty("user.dir"));
+                } else {
+                    error.add("Invalid path or The directory does not exist: " + directory.getAbsolutePath());
+                }
+            } else {
+                // Relative path provided
+                File currentDirectory = new File(System.getProperty("user.dir"));
+                File newDirectory = new File(currentDirectory, path);
+
+                if (newDirectory.exists() && newDirectory.isDirectory()) {
+                    System.setProperty("user.dir", newDirectory.getAbsolutePath());
+                    output.add("Changed working directory to: " + System.getProperty("user.dir"));
+                } else {
+                    error.add("Invalid path or The directory does not exist: " + newDirectory.getAbsolutePath());
+                }
+            
+            }
         }
     }
     
@@ -94,7 +123,7 @@ public class Terminal {
             }
         }
     }
-    // 
+    // Takes 1 argument which is either the full path or the short path that ends with a directory name and creates this directory.
     public void mkdir(String[] args){
         if(args.length == 0){
             error.add("No arguments specified.");
@@ -103,7 +132,8 @@ public class Terminal {
         if(args.length > 1){
             path = String.join(" ", args);
         }
-        File directory = new File(path);
+        File currentDirectory = new File(System.getProperty("user.dir"));
+        File directory = new File(currentDirectory, path);
         if (directory.exists()) {
             error.add("Directory '" + path + "' already exists.");
         } else {
@@ -120,11 +150,14 @@ public class Terminal {
             String path = args[0];
             if(args.length > 1){
                 path = String.join(" ", args);
-                output.add(path);
             }
-            File file = new File(path);
-            file.createNewFile();
-            output.add("File " + file.getName() + " created successfully.");
+            File currentDirectory = new File(System.getProperty("user.dir"));
+            File file = new File(currentDirectory, path);
+            if(file.createNewFile()){
+                output.add("File " + file.getName() + " created successfully.");
+            }else{
+                error.add("File " + file.getName() + " already exists.");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -134,7 +167,8 @@ public class Terminal {
         if(args.length == 0){
             error.add("You must specify a file name.");
         }else if(args.length == 1){
-            File file = new File(args[0]);
+            File currentDirectory = new File(System.getProperty("user.dir"));
+            File file = new File(currentDirectory, args[0]);
             if (file.exists()) {
                 if (file.delete()) {
                     output.add("File " + args[0] + " has been removed.");
@@ -159,6 +193,8 @@ public class Terminal {
     }
     public void printFileContent(String fileName) {
         try {
+            File currentDirectory = new File(System.getProperty("user.dir"));
+            fileName = currentDirectory.getAbsolutePath() + "\\" + fileName;
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -172,6 +208,9 @@ public class Terminal {
     
     public void concatenateAndPrintFiles(String fileName1, String fileName2) {
         try {
+            File currentDirectory = new File(System.getProperty("user.dir"));
+            fileName1 = currentDirectory.getAbsolutePath() + "\\" + fileName1;
+            fileName2 = currentDirectory.getAbsolutePath() + "\\" + fileName2;
             BufferedReader reader1 = new BufferedReader(new FileReader(fileName1));
             BufferedReader reader2 = new BufferedReader(new FileReader(fileName2));
 
@@ -196,6 +235,8 @@ public class Terminal {
         int wordCount = 0;
         int charCount = 0;
         try {
+            File currentDirectory = new File(System.getProperty("user.dir"));
+            fileName = currentDirectory.getAbsolutePath() + "\\" + fileName;
             BufferedReader reader = new BufferedReader(new FileReader(fileName));
             String line;
 
@@ -231,6 +272,9 @@ public class Terminal {
     public void cp(String[] args){
         if(args.length == 2){
             try {
+                File currentDirectory = new File(System.getProperty("user.dir"));
+                args[0] = currentDirectory.getAbsolutePath() + "\\" + args[0];
+                args[1] = currentDirectory.getAbsolutePath() + "\\" + args[1];
                 BufferedReader reader = new BufferedReader(new FileReader(args[0]));
                 FileWriter writer = new FileWriter(args[1]);
                 String line;
