@@ -307,20 +307,22 @@ public class Terminal {
                     }
                 }
             }else{
+                File currentDirectory = new File(System.getProperty("user.dir"));
+                args[0] = currentDirectory.getAbsolutePath() + "\\" + args[0];
                 File file = new File(args[0]);
                 if (file.exists()) {
                     File[] subDirs = file.listFiles();
                     if(subDirs.length == 0){
                         if (file.delete()) {
-                            output.add("Directory " + args[0] + " has been removed.");
+                            output.add("Directory " + file.getName() + " has been removed.");
                         } else {
-                            error.add("Unable to remove the directory " + args[0]);
+                            error.add("Unable to remove the directory " + file.getName());
                         }
                     }else{
-                        error.add("Directory " + args[0] + " is not empty.");
+                        error.add("Directory " + file.getName()  + " is not empty.");
                     }
                 } else {
-                    error.add("Directory " + args[0] + " does not exist in the current directory.");
+                    error.add("Directory " + file.getName()  + " does not exist in the current directory.");
                 }
             }
             
