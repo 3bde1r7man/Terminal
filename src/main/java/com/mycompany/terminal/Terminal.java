@@ -15,6 +15,78 @@ import java.util.List;
  * @author Abelrhman Mostafa
  * @author Ahmed Hanfy
  */
+class Parser {
+    String commandName;
+    String[] args;
+    boolean outputToFile = false;
+    boolean outputToAppend = false;
+    String outputFile = null;
+
+    public boolean parse(String input) {
+        // Split the input into commandName and args
+        String[] words = input.split(" ");
+        
+        // Initialize args as an empty array with the same length as words
+        int length = words.length;
+        for (int i = 0; i < words.length; i++) {
+            if (i == words.length - 2) {
+                if (words[i].equals(">")) {        
+                    outputToFile = true;
+                    outputToAppend = false;
+                    outputFile = words[i + 1];
+                    length = i;
+                    break;
+                }
+                else if (words[i].equals(">>")) {
+                    outputToAppend = true;
+                    outputToFile = false;
+                    outputFile = words[i + 1];
+                    length = i;
+                    break;
+                } else {
+                    outputToAppend = false;
+                    outputToFile = false;
+                    outputFile = null;
+                }
+            }
+        }
+        
+        args = new String[length - 1];
+        // Set commandName to the first word
+        commandName = words[0];
+
+        for (int i = 1; i < words.length && words[i] != ""; i++) {
+            // check if the next word is a redirection operator and if the word after that is not empty
+            if(((i + 1) != words.length ) && (words[i].equals(">") || words[i].equals(">>")) && (!words[i + 1].equals(""))) {
+                break;
+            }
+            args[i - 1] = words[i];
+        }
+
+
+        return true;
+    }
+
+    public String getCommandName() {
+        return commandName;
+    }
+
+    public String[] getArgs() {
+        return args;
+    }
+
+    public boolean isOutputToFile() {
+        return outputToFile;
+    }
+
+    public boolean isOutputToAppend() {
+        return outputToAppend;
+    }
+
+    public String getOutputFile() {
+        return outputFile;
+    }
+}
 
 public class Terminal {
     Parser parser;
@@ -129,15 +201,28 @@ public class Terminal {
         if(args.length > 1){
             path = String.join(" ", args);
         }
-        File currentDirectory = new File(System.getProperty("user.dir"));
-        File directory = new File(currentDirectory, path);
-        if (directory.exists()) {
-            error.add("Directory '" + path + "' already exists.");
-        } else {
-            if (directory.mkdirs()) {
-                output.add("Directory '" + path + "' created successfully.");
+        File directory = new File(path);
+        if(directory.isAbsolute()){
+            if (directory.exists()) {
+                error.add("Directory '" + path + "' already exists.");
             } else {
-                error.add("Failed to create directory '" + path + "'.");
+                if (directory.mkdirs()) {
+                    output.add("Directory '" + path + "' created successfully.");
+                } else {
+                    error.add("Failed to create directory '" + path + "'.");
+                }
+            }
+        }else{
+            File currentDirectory = new File(System.getProperty("user.dir"));
+            File newDirectory = new File(currentDirectory, path);
+            if (newDirectory.exists()) {
+                error.add("Directory '" + path + "' already exists.");
+            } else {
+                if (newDirectory.mkdirs()) {
+                    output.add("Directory '" + path + "' created successfully.");
+                } else {
+                    error.add("Failed to create directory '" + path + "'.");
+                }
             }
         }
     }
@@ -148,12 +233,22 @@ public class Terminal {
             if(args.length > 1){
                 path = String.join(" ", args);
             }
-            File currentDirectory = new File(System.getProperty("user.dir"));
-            File file = new File(currentDirectory, path);
-            if(file.createNewFile()){
-                output.add("File " + file.getName() + " created successfully.");
+            File directory = new File(path);
+            if(directory.isAbsolute()){
+                File file = new File(path);
+                if(file.createNewFile()){
+                    output.add("File " + file.getName() + " created successfully.");
+                }else{
+                    error.add("File " + file.getName() + " already exists.");
+                }
             }else{
-                error.add("File " + file.getName() + " already exists.");
+                File currentDirectory = new File(System.getProperty("user.dir"));
+                File file = new File(currentDirectory, path);
+                if(file.createNewFile()){
+                    output.add("File " + file.getName() + " created successfully.");
+                }else{
+                    error.add("File " + file.getName() + " already exists.");
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
