@@ -15,6 +15,7 @@ import java.util.List;
  * @author Abelrhman Mostafa
  * @author Ahmed Hanfy
  */
+
 class Parser {
     String commandName;
     String[] args;
@@ -177,7 +178,6 @@ public class Terminal {
         File[] files = currentDirectory.listFiles();
         
         if (files != null) {
-            output.add("Files in the current directory:");
             if(args.length == 1 && "-r".equals(args[0])) {
                 for (int i = files.length - 1; i >= 0; i--) {
                     output.add(files[i].getName());
@@ -322,6 +322,7 @@ public class Terminal {
     }
     // count the number of line &  words and characters in the file
     public void wc(String[] args) {
+        String FileName = args[0];
         String fileName = args[0];
         int lineCount = 0;
         int wordCount = 0;
@@ -343,10 +344,7 @@ public class Terminal {
             System.err.println("Error reading the file: " + e.getMessage());
         }
 
-        output.add("Lines: " + lineCount);
-        output.add("Words: " + wordCount);
-        output.add("Characters: " + charCount);
-        output.add("File Name: " + fileName);
+        output.add(lineCount + " " + wordCount + " " + charCount + " " + FileName);
     }
 
     // history command
@@ -399,22 +397,40 @@ public class Terminal {
                     }
                 }
             }else{
-                File currentDirectory = new File(System.getProperty("user.dir"));
-                args[0] = currentDirectory.getAbsolutePath() + "\\" + args[0];
-                File file = new File(args[0]);
-                if (file.exists()) {
-                    File[] subDirs = file.listFiles();
-                    if(subDirs.length == 0){
-                        if (file.delete()) {
-                            output.add("Directory " + file.getName() + " has been removed.");
-                        } else {
-                            error.add("Unable to remove the directory " + file.getName());
+                File directory = new File(args[0]);
+                if (directory.isAbsolute()){
+                    if (directory.exists()) {
+                        File[] subDirs = directory.listFiles();
+                        if(subDirs.length == 0){
+                            if (directory.delete()) {
+                                output.add("Directory " + directory.getName() + " has been removed.");
+                            } else {
+                                error.add("Unable to remove the directory " + directory.getName());
+                            }
+                        }else{
+                            error.add("Directory " + directory.getName()  + " is not empty.");
                         }
-                    }else{
-                        error.add("Directory " + file.getName()  + " is not empty.");
+                    } else {
+                        error.add("Directory " + directory.getName()  + " does not exist in the current directory.");
                     }
-                } else {
-                    error.add("Directory " + file.getName()  + " does not exist in the current directory.");
+                }else{
+                    File currentDirectory = new File(System.getProperty("user.dir"));
+                    args[0] = currentDirectory.getAbsolutePath() + "\\" + args[0];
+                    File newDirectory = new File(args[0]);
+                    if (newDirectory.exists()) {
+                        File[] subDirs = newDirectory.listFiles();
+                        if(subDirs.length == 0){
+                            if (newDirectory.delete()) {
+                                output.add("Directory " + newDirectory.getName() + " has been removed.");
+                            } else {
+                                error.add("Unable to remove the directory " + newDirectory.getName());
+                            }
+                        }else{
+                            error.add("Directory " + newDirectory.getName()  + " is not empty.");
+                        }
+                    } else {
+                        error.add("Directory " + newDirectory.getName()  + " does not exist in the current directory.");
+                    }
                 }
             }
             
