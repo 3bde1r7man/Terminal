@@ -51,9 +51,6 @@ Takes 1 argument (full or relative path ending with a file name) and creates the
 ### `cp`
 Takes 2 arguments (both files) and copies the first onto the second.
 
-### `cp -r`
-Takes 2 arguments (both directories) and copies the first directory (with all content) into the second.
-
 ### `rm`
 Takes 1 argument (file name) that exists in the current directory and removes the file.
 
