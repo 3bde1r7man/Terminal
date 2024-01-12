@@ -197,34 +197,35 @@ public class Terminal {
         if(args.length == 0){
             error.add("No arguments specified.");
         }
-        String path = args[0];
-        if(args.length > 1){
-            path = String.join(" ", args);
-        }
-        File directory = new File(path);
-        if(directory.isAbsolute()){
-            if (directory.exists()) {
-                error.add("Directory '" + path + "' already exists.");
-            } else {
-                if (directory.mkdirs()) {
-                    output.add("Directory '" + path + "' created successfully.");
+        String path;
+        for(int i = 0;i < args.length; i++){
+            path = args[i];
+            File directory = new File(path);
+            if(directory.isAbsolute()){
+                if (directory.exists()) {
+                    error.add("Directory '" + path + "' already exists.");
                 } else {
-                    error.add("Failed to create directory '" + path + "'.");
+                    if (directory.mkdirs()) {
+                        output.add("Directory '" + path + "' created successfully.");
+                    } else {
+                        error.add("Failed to create directory '" + path + "'.");
+                    }
+                }
+            }else{
+                File currentDirectory = new File(System.getProperty("user.dir"));
+                File newDirectory = new File(currentDirectory, path);
+                if (newDirectory.exists()) {
+                    error.add("Directory '" + path + "' already exists.");
+                } else {
+                    if (newDirectory.mkdirs()) {
+                        output.add("Directory '" + path + "' created successfully.");
+                    } else {
+                        error.add("Failed to create directory '" + path + "'.");
+                    }
                 }
             }
-        }else{
-            File currentDirectory = new File(System.getProperty("user.dir"));
-            File newDirectory = new File(currentDirectory, path);
-            if (newDirectory.exists()) {
-                error.add("Directory '" + path + "' already exists.");
-            } else {
-                if (newDirectory.mkdirs()) {
-                    output.add("Directory '" + path + "' created successfully.");
-                } else {
-                    error.add("Failed to create directory '" + path + "'.");
-                }
-            }
         }
+        
     }
     // Takes 1 argument which is either the full path or the short path that ends with a file name and creates this file.
     public void touch(String[] args){
